@@ -1,0 +1,142 @@
+
+import random
+
+
+def generate_password(length):
+    characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%"
+    password = ""
+
+    for i in range(length):
+        password += random.choice(characters)
+
+    return password
+
+
+def check_password_strength(password):
+    has_digit = False
+    has_upper = False
+
+    for char in password:
+        if char.isdigit():
+            has_digit = True
+        if char.isupper():
+            has_upper = True
+
+    if len(password) >= 8 and has_digit and has_upper:
+        return "надійний"
+    else:
+        return "слабкий"
+
+
+def set_master_password():
+    password = input("Придумай головний пароль: ")
+
+    strength = check_password_strength(password)
+    print("Надійність пароля:", strength)
+
+    if strength == "слабкий":
+        choice = input("Згенерувати надійний пароль? (так/ні): ")
+
+        if choice.lower() == "так":
+            password = generate_password(12)
+            print("Твій новий пароль:", password)
+        else:
+            print("Використовуємо введений пароль.")
+
+    return password
+
+
+def login_gate(master_password):
+    print("\nВхід до Менеджера задач.")
+
+    for attempt in range(1, 4):
+        entered = input("Введи пароль: ")
+
+        if entered == master_password:
+            print("Пароль правильний. Ласкаво просимо!")
+            return True
+        else:
+            remaining = 3 - attempt
+            print(f"Невірний пароль! Залишилося спроб: {remaining}")
+
+    print("Доступ заблоковано через підозрілу активність!")
+    return False
+
+
+tasks = []
+
+
+def show_menu():
+    print("\n===== МЕНЕДЖЕР ЗАДАЧ =====")
+    print("1. Додати завдання")
+    print("2. Переглянути завдання")
+    print("3. Видалити завдання")
+    print("4. Вийти")
+
+
+def add_task(tasks):
+    text = input("Введи нове завдання: ")
+
+    if text.strip() == "":
+        print("Завдання не може бути порожнім.")
+        return
+
+    tasks.append({"text": text, "done": False})
+    print("Завдання додано!")
+
+
+def view_tasks(tasks):
+    if len(tasks) == 0:
+        print("Список завдань поки порожній.")
+        return
+
+    print("\nТвій список завдань:")
+
+    for index, task in enumerate(tasks, start=1):
+        status = "[x]" if task["done"] else "[ ]"
+        print(f"{index}. {status} {task['text']}")
+
+
+def delete_task(tasks):
+    if len(tasks) == 0:
+        print("Немає завдань для видалення.")
+        return
+
+    view_tasks(tasks)
+
+    try:
+        number = int(input("Введи номер завдання для видалення: "))
+
+        if 1 <= number <= len(tasks):
+            removed_task = tasks.pop(number - 1)
+            print("Видалено завдання:", removed_task["text"])
+        else:
+            print("Неправильний номер завдання.")
+
+    except ValueError:
+        print("Потрібно ввести число.")
+
+
+if __name__ == "__main__":
+    master_password = set_master_password()
+
+    access_granted = login_gate(master_password)
+
+    # Головне меню тимчасово запускається без перевірки.
+    # У наступному кроці додамо блокування доступу.
+
+    while True:
+        show_menu()
+        choice = input("Обери дію (1-4): ")
+
+        if choice == "1":
+            add_task(tasks)
+        elif choice == "2":
+            view_tasks(tasks)
+        elif choice == "3":
+            delete_task(tasks)
+        elif choice == "4":
+            print("До побачення!")
+            break
+        else:
+            print("Неправильний вибір. Спробуй ще раз.")
