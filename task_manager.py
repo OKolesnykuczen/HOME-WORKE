@@ -122,21 +122,19 @@ if __name__ == "__main__":
 
     access_granted = login_gate(master_password)
 
-    # Головне меню тимчасово запускається без перевірки.
-    # У наступному кроці додамо блокування доступу.
+    if access_granted:
+        while True:
+            show_menu()
+            choice = input("Обери дію (1-4): ")
 
-    while True:
-        show_menu()
-        choice = input("Обери дію (1-4): ")
-
-        if choice == "1":
-            add_task(tasks)
-        elif choice == "2":
-            view_tasks(tasks)
-        elif choice == "3":
-            delete_task(tasks)
-        elif choice == "4":
-            print("До побачення!")
-            break
-        else:
-            print("Неправильний вибір. Спробуй ще раз.")
+            if choice == "1":
+                add_task(tasks)
+            elif choice == "2":
+                view_tasks(tasks)
+            elif choice == "3":
+                delete_task(tasks)
+            elif choice == "4":
+                print("До побачення!")
+                break
+            else:
+                print("Неправильний вибір. Спробуй ще раз.")
