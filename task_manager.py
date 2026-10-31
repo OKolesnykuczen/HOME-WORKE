@@ -158,7 +158,17 @@ if __name__ == "__main__":
         while True:
             show_menu()
             choice = input("Обери дію (1-4): ")
+def load_tasks(filename=TASKS_FILE):
 
+try:
+
+with open(filename, "r", encoding="utf-8") as file:
+
+return json.load(file)
+
+except FileNotFoundError:
+
+return []
             if choice == "1":
                 add_task(tasks)
             elif choice == "2":
