@@ -2,8 +2,7 @@
 import random
 import json
 
-tasks = [{"text": "Купити хліб", "done": False}]
-
+TASKS_FILE = "tasks.json"
 
 
 def generate_password(length):
@@ -67,43 +66,28 @@ def login_gate(master_password):
     return False
 
 
-tasks = []
+def save_tasks(tasks, filename=TASKS_FILE):
+    with open(filename, "w", encoding="utf-8") as file:
+        json.dump(tasks, file, ensure_ascii=False, indent=2)
 
-def mark_task_done(tasks):
 
-if len(tasks) == 0:
+def load_tasks(filename=TASKS_FILE):
+    try:
+        with open(filename, "r", encoding="utf-8") as file:
+            return json.load(file)
 
-print("Список завдань порожній.")
+    except FileNotFoundError:
+        return []
 
-return
 
-    view_tasks(tasks)
-
-    number = input("Введи номер виконаного завдання: ")
-
-if not number.isdigit():
-
-print("Потрібно ввести число.")
-
-return
-
-    number = int(number)
-
-if number < 1 or number > len(tasks):
-
-print("Немає завдання з таким номером.")
-
-return
-
-    tasks[number - 1]["done"] = True
-
-print("Завдання позначено виконаним:", tasks[number - 1]["text"])
 def show_menu():
     print("\n===== МЕНЕДЖЕР ЗАДАЧ =====")
     print("1. Додати завдання")
     print("2. Переглянути завдання")
     print("3. Видалити завдання")
-    print("4. Вийти")
+    print("4. Позначити завдання виконаним")
+    print("5. Змінити головний пароль")
+    print("6. Вийти")
 
 
 def add_task(tasks):
@@ -114,6 +98,7 @@ def add_task(tasks):
         return
 
     tasks.append({"text": text, "done": False})
+    save_tasks(tasks)
     print("Завдання додано!")
 
 
@@ -141,6 +126,7 @@ def delete_task(tasks):
 
         if 1 <= number <= len(tasks):
             removed_task = tasks.pop(number - 1)
+            save_tasks(tasks)
             print("Видалено завдання:", removed_task["text"])
         else:
             print("Неправильний номер завдання.")
@@ -149,7 +135,40 @@ def delete_task(tasks):
         print("Потрібно ввести число.")
 
 
+def mark_task_done(tasks):
+    if len(tasks) == 0:
+        print("Список завдань порожній.")
+        return
+
+    view_tasks(tasks)
+
+    number = input("Введи номер виконаного завдання: ")
+
+    if not number.isdigit():
+        print("Потрібно ввести число.")
+        return
+
+    number = int(number)
+
+    if number < 1 or number > len(tasks):
+        print("Немає завдання з таким номером.")
+        return
+
+    tasks[number - 1]["done"] = True
+    save_tasks(tasks)
+
+    print("Завдання позначено виконаним:", tasks[number - 1]["text"])
+
+
+def change_master_password():
+    print("\nЗміна головного пароля.")
+
+    return set_master_password()
+
+
 if __name__ == "__main__":
+    tasks = load_tasks()
+
     master_password = set_master_password()
 
     access_granted = login_gate(master_password)
@@ -157,26 +176,26 @@ if __name__ == "__main__":
     if access_granted:
         while True:
             show_menu()
-            choice = input("Обери дію (1-4): ")
-def load_tasks(filename=TASKS_FILE):
+            choice = input("Обери дію (1-6): ")
 
-try:
-
-with open(filename, "r", encoding="utf-8") as file:
-
-return json.load(file)
-
-except FileNotFoundError:
-
-return []
             if choice == "1":
                 add_task(tasks)
+
             elif choice == "2":
                 view_tasks(tasks)
+
             elif choice == "3":
                 delete_task(tasks)
+
             elif choice == "4":
+                mark_task_done(tasks)
+
+            elif choice == "5":
+                master_password = change_master_password()
+
+            elif choice == "6":
                 print("До побачення!")
                 break
+
             else:
                 print("Неправильний вибір. Спробуй ще раз.")
