@@ -40,7 +40,7 @@ def set_master_password():
     if strength == "слабкий":
         choice = input("Згенерувати надійний пароль? (так/ні): ")
 
-        if choice.lower() == "так":
+        if choice.lower().strip() == "так":
             password = generate_password(12)
             print("Твій новий пароль:", password)
         else:
@@ -122,7 +122,7 @@ def delete_task(tasks):
     view_tasks(tasks)
 
     try:
-        number = int(input("Введи номер завдання для видалення: "))
+        number = int(input("Введи номер завдання для видалення: ").strip())
 
         if 1 <= number <= len(tasks):
             removed_task = tasks.pop(number - 1)
@@ -142,7 +142,7 @@ def mark_task_done(tasks):
 
     view_tasks(tasks)
 
-    number = input("Введи номер виконаного завдання: ")
+    number = input("Введи номер виконаного завдання: ").strip()
 
     if not number.isdigit():
         print("Потрібно ввести число.")
@@ -162,40 +162,43 @@ def mark_task_done(tasks):
 
 def change_master_password():
     print("\nЗміна головного пароля.")
-
     return set_master_password()
 
 
-if __name__ == "__main__":
+def main():
     tasks = load_tasks()
 
     master_password = set_master_password()
 
-    access_granted = login_gate(master_password)
+    if not login_gate(master_password):
+        return
 
-    if access_granted:
-        while True:
-            show_menu()
-            choice = input("Обери дію (1-6): ")
+    while True:
+        show_menu()
+        choice = input("Обери дію (1-6): ").strip()
 
-            if choice == "1":
-                add_task(tasks)
+        if choice == "1":
+            add_task(tasks)
 
-            elif choice == "2":
-                view_tasks(tasks)
+        elif choice == "2":
+            view_tasks(tasks)
 
-            elif choice == "3":
-                delete_task(tasks)
+        elif choice == "3":
+            delete_task(tasks)
 
-            elif choice == "4":
-                mark_task_done(tasks)
+        elif choice == "4":
+            mark_task_done(tasks)
 
-            elif choice == "5":
-                master_password = change_master_password()
+        elif choice == "5":
+            master_password = change_master_password()
 
-            elif choice == "6":
-                print("До побачення!")
-                break
+        elif choice == "6":
+            print("До побачення!")
+            break
 
-            else:
-                print("Неправильний вибір. Спробуй ще раз.")
+        else:
+            print("Неправильний вибір. Спробуй ще раз.")
+
+
+if __name__ == "__main__":
+    main()
